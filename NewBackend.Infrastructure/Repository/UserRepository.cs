@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.IdentityModel.Tokens;
 using NewBackend.Application.IRepository;
+using NewBackend.Application.ProceduresUsed;
 using NewBackend.Domain.Entity;
 using NewBackend.Infrastructure.Data;
 using System;
@@ -26,7 +27,7 @@ namespace NewBackend.Infrastructure.Repository
         {
             using (var connection = _dapperContext.CreateConnection())
             {
-                var query = "SP_Signup_Suman";
+                var query = procedure.Insert;
                 var parameter = new
                 {
                     firstname = userModel.FirstName,
@@ -47,7 +48,7 @@ namespace NewBackend.Infrastructure.Repository
         {
             using (var connection = _dapperContext.CreateConnection())
             {
-                var query = "Select * from tbl_UserDetails_Suman u join tbl_LoginCredentials_Suman l on u.UserId=l.UserID";
+                var query = procedure.Get;
                 var message = await connection.QueryAsync<UserModel>(query, commandType: CommandType.Text);
                 return message;
             }
@@ -56,7 +57,7 @@ namespace NewBackend.Infrastructure.Repository
         {
             using (var connection = _dapperContext.CreateConnection())
             {
-                var query = "SP_Update_Suman";
+                var query = procedure.Update;
                 var parameter = new
                 {
                     Id = userModel.UserID,
@@ -76,18 +77,29 @@ namespace NewBackend.Infrastructure.Repository
 
 
         }
-        public void Delete(int id )
+        public void Delete(int id)
         {
-            using(var connection = _dapperContext.CreateConnection())
+            using (var connection = _dapperContext.CreateConnection())
             {
-                var query = "SP_Delete";
+                var query = procedure.Delete;
                 var param = new
-                    {
+                {
                     id = id
                 };
-                connection.ExecuteAsync(query,param,commandType:CommandType.StoredProcedure);
+                connection.ExecuteAsync(query, param, commandType: CommandType.StoredProcedure);
             }
         }
 
-    }
+        public async Task<int> Validate(LoginDetails loginDetails)
+        {
+            using (var connection = _dapperContext.CreateConnection())
+            {
+                var query = procedure.Validate;
+                var param = new { loginDetails.Email, loginDetails.Password };
+                var result = await connection.QueryFirstOrDefaultAsync<int>(query, param, commandType: CommandType.StoredProcedure);
+                return result;
+            }
+
+        }
+    } 
 }

@@ -43,5 +43,11 @@ namespace NewBackend.Infrastructure.Service
            return result;
            
         }
+        public async Task<int> Validate(LoginDetails loginDetails)
+        {
+            return await _repository.Validate(loginDetails);
+        }
+
+       
     }
 }

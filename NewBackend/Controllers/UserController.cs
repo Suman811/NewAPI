@@ -30,15 +30,15 @@ namespace NewBackend.Controllers
             return Ok(await _userService.CreateSignup(userModel));
         }
         [HttpPut("UpdateUser")]
-        public  async Task<IActionResult> Update(UserModel userModel)
+        public async Task<IActionResult> Update(UserModel userModel)
         {
-            var result= await _userService.Update(userModel);
+            var result = await _userService.Update(userModel);
             if (result > 0)
             {
-               return Ok("User Updated");
+                return Ok("User Updated");
             }
             return Ok("User not registered");
-            
+
         }
 
 
@@ -48,6 +48,20 @@ namespace NewBackend.Controllers
             _userService.Delete(id);
 
         }
+
+        [HttpPost("ValidateUser")]
+        public async Task<IActionResult> Validate(LoginDetails loginDetails)
+
+        {
+            if (!ModelState.IsValid) BadRequest();
+            var result = await _userService.Validate(loginDetails);
+            if (result == 0)
+            {
+                return Unauthorized(new { Message = "Enter correct email and password" });
+
+            }
+            return Ok(result);
         }
 
-    } 
+    }
+}

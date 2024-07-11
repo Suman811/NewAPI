@@ -13,5 +13,6 @@ namespace NewBackend.Application.IService
         Task<IEnumerable<UserModel>> GetDetails();
         Task <int> Update(UserModel userModel);
        void Delete(int id);
+        Task<int> Validate(LoginDetails loginDetails);
     }
 }

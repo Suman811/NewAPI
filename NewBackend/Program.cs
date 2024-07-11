@@ -22,6 +22,21 @@ namespace NewBackend
             builder.Services.AddTransient<DapperContext>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService,UserService>();
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    builder =>
+                    {
+                        builder
+                            .AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                    });
+            });
+
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -30,7 +45,7 @@ namespace NewBackend
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseCors("AllowAll");
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
