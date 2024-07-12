@@ -15,53 +15,50 @@ namespace NewBackend.Controllers
         public UserController(IUserService userService)
         {
             _userService = userService;
-
         }
 
         [HttpGet("GetDetails")]
         public async Task<IActionResult> GetDetails()
         {
-            return Ok(await _userService.GetDetails());
+            var result = await _userService.GetDetails();
+            return Ok(new ResponseModel { StatusCode = 200, StatusMessage = "Success", Data = null });
         }
 
         [HttpPost("AddUser")]
         public async Task<IActionResult> CreateSignup(UserModel userModel)
         {
-            return Ok(await _userService.CreateSignup(userModel));
+            var result = await _userService.CreateSignup(userModel);
+            return Ok(new ResponseModel { StatusCode = 201, StatusMessage = "User created successfully", Data = null });
         }
+
         [HttpPut("UpdateUser")]
         public async Task<IActionResult> Update(UserModel userModel)
         {
             var result = await _userService.Update(userModel);
             if (result > 0)
             {
-                return Ok("User Updated");
+                return Ok(new ResponseModel { StatusCode = 200, StatusMessage = "User updated successfully", Data = null });
             }
-            return Ok("User not registered");
-
+            return Ok(new ResponseModel { StatusCode = 404, StatusMessage = "User not found", Data = null });
         }
 
-
         [HttpDelete("DeleteUser")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
             _userService.Delete(id);
-
+            return Ok(new ResponseModel { StatusCode = 200, StatusMessage = "User deleted successfully", Data = null });
         }
 
         [HttpPost("ValidateUser")]
         public async Task<IActionResult> Validate(LoginDetails loginDetails)
-
         {
-            if (!ModelState.IsValid) BadRequest();
+            if (!ModelState.IsValid) return BadRequest(new ResponseModel { StatusCode = 400, StatusMessage = "Invalid request", Data = null });
             var result = await _userService.Validate(loginDetails);
             if (result == 0)
             {
-                return Unauthorized(new { Message = "Enter correct email and password" });
-
+                return Unauthorized(new ResponseModel { StatusCode = 401, StatusMessage = "Invalid credentials", Data = null });
             }
-            return Ok(result);
+            return Ok(new ResponseModel { StatusCode = 200, StatusMessage = "User validated successfully", Data = null });
         }
-
     }
 }
