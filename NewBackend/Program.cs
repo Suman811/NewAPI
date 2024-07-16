@@ -1,9 +1,12 @@
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using NewBackend.Application.IRepository;
 using NewBackend.Application.IService;
 using NewBackend.Infrastructure.Data;
 using NewBackend.Infrastructure.Repository;
 using NewBackend.Infrastructure.Service;
+using System.Text;
 
 namespace NewBackend
 {
@@ -35,7 +38,18 @@ namespace NewBackend
                     });
             });
 
-
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:key"]))
+                };
+            });
 
             var app = builder.Build();
 

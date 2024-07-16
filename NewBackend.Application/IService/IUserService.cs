@@ -14,5 +14,6 @@ namespace NewBackend.Application.IService
         Task <int> Update(UserModel userModel);
        void Delete(int id);
         Task<int> Validate(LoginDetails loginDetails);
+        string GenerateToken(LoginDetails loginDetails);
     }
 }

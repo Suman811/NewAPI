@@ -50,7 +50,7 @@ namespace NewBackend.Controllers
         }
 
         [HttpPost("ValidateUser")]
-        public async Task<IActionResult> Validate(LoginDetails loginDetails)
+        public async Task<IActionResult> Validate([FromBody] LoginDetails loginDetails)
         {
             if (!ModelState.IsValid) return BadRequest(new ResponseModel { StatusCode = 400, StatusMessage = "Invalid request", Data = null });
             var result = await _userService.Validate(loginDetails);
@@ -58,7 +58,9 @@ namespace NewBackend.Controllers
             {
                 return Unauthorized(new ResponseModel { StatusCode = 401, StatusMessage = "Invalid credentials", Data = null });
             }
-            return Ok(new ResponseModel { StatusCode = 200, StatusMessage = "User validated successfully", Data = null });
+            var token = _userService.GenerateToken(loginDetails);
+
+            return Ok(new ResponseModel { StatusCode = 200, StatusMessage = "User validated successfully", Data = token });
         }
     }
 }
