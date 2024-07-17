@@ -23,7 +23,7 @@ namespace NewBackend.Infrastructure.Repository
         }
 
 
-        public async Task<int> CreateSignup(UserModel userModel)
+        public async Task<ResponseModel> CreateSignup(UserModel userModel)
         {
             try
             {
@@ -43,17 +43,17 @@ namespace NewBackend.Infrastructure.Repository
 
                     };
                     var message = await connection.ExecuteAsync(query, parameter, commandType: CommandType.StoredProcedure);
-                    return message;
+                    return new ResponseModel { StatusMessage=StaticData.createMessage,StatusCode=StaticData.successcode, Data = StaticData.data };
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return 0;
+                return new ResponseModel { Data = StaticData.data, StatusMessage = StaticData.createMessage, StatusCode = StaticData.successcode };
             }
             
         }
-        public async Task<IEnumerable<UserModel>> GetDetails()
+        public async Task<ResponseModel> GetDetails()
         {
             try
             {
@@ -61,16 +61,16 @@ namespace NewBackend.Infrastructure.Repository
                 {
                     var query = procedure.Get;
                     var message = await connection.QueryAsync<UserModel>(query, commandType: CommandType.Text);
-                    return message;
+                    return new ResponseModel { Data = message, StatusMessage = StaticData.createMessage, StatusCode = StaticData.successcode };
                 }
             }
             catch(Exception ex)
             { 
                 Console.WriteLine(ex.Message);
-                return Enumerable.Empty<UserModel>();
+                return new ResponseModel { Data = StaticData.errorMessage, StatusMessage = StaticData.errorMessage, StatusCode = StaticData.errorCode };
             }
         }
-        public async Task<int> Update(UserModel userModel)
+        public async Task<ResponseModel> Update(UserModel userModel)
         {
             try
             {
@@ -91,14 +91,14 @@ namespace NewBackend.Infrastructure.Repository
 
                     };
                     var result = await connection.ExecuteAsync(query, parameter, commandType: CommandType.StoredProcedure);
-                    return result;
+                    return new ResponseModel { Data = StaticData.data, StatusMessage = StaticData.createMessage, StatusCode = StaticData.successcode };
                 }
             }
             catch (Exception ex) 
             {
                 
                 Console.WriteLine(ex.Message);
-                return 0;
+                return new ResponseModel { Data = StaticData.data, StatusMessage = StaticData.createMessage, StatusCode = StaticData.successcode };
             }
 
 
@@ -132,8 +132,8 @@ namespace NewBackend.Infrastructure.Repository
                 {
                     var query = procedure.Validate;
                     var param = new { loginDetails.Email, loginDetails.Password };
-                    var result = await connection.QueryFirstOrDefaultAsync<int>(query, param, commandType: CommandType.StoredProcedure);
-                    return result;
+                    return await connection.QueryFirstOrDefaultAsync<int>(query, param, commandType: CommandType.StoredProcedure);
+                    //return new ResponseModel { Data = StaticData.data, StatusMessage = StaticData.createMessage, StatusCode = StaticData.successcode };
                 }
             }
             catch (Exception ex)

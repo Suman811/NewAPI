@@ -9,11 +9,11 @@ namespace NewBackend.Application.IService
 {
     public interface IUserService
     {
-        Task<int> CreateSignup(UserModel userModel);
-        Task<IEnumerable<UserModel>> GetDetails();
-        Task <int> Update(UserModel userModel);
-       void Delete(int id);
+        Task<ResponseModel> CreateSignup(UserModel userModel);
+        Task<ResponseModel> GetDetails();
+        Task <ResponseModel> Update(UserModel userModel);
+        void Delete(int id);
         Task<int> Validate(LoginDetails loginDetails);
-        string GenerateToken(LoginDetails loginDetails);
+       // string GenerateToken(LoginDetails loginDetails);
     }
 }

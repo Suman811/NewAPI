@@ -10,9 +10,9 @@ namespace NewBackend.Application.IRepository
     public interface IUserRepository
     {
 
-        Task<int> CreateSignup(UserModel userModel);
-        Task<IEnumerable<UserModel>> GetDetails();
-        Task<int> Update(UserModel userModel);
+        Task<ResponseModel> CreateSignup(UserModel userModel);
+        Task<ResponseModel> GetDetails();
+        Task<ResponseModel> Update(UserModel userModel);
         void Delete(int id);
         Task<int> Validate(LoginDetails loginDetails);
     }

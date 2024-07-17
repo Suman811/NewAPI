@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NewBackend.Application.IService;
 using NewBackend.Domain.Entity;
+using NewBackend.Infrastructure.Service;
 
 namespace NewBackend.Controllers
 {
@@ -11,10 +12,11 @@ namespace NewBackend.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-
-        public UserController(IUserService userService)
+        private readonly IConfiguration _config;
+        public UserController(IUserService userService,IConfiguration config)
         {
             _userService = userService;
+            _config = config;
         }
 
         [HttpGet("GetDetails")]
@@ -28,39 +30,43 @@ namespace NewBackend.Controllers
         public async Task<IActionResult> CreateSignup(UserModel userModel)
         {
             var result = await _userService.CreateSignup(userModel);
-            return Ok(new ResponseModel { StatusCode = 201, StatusMessage = "User created successfully", Data = null });
+            return Ok(new ResponseModel { StatusCode = 200, StatusMessage = "User created successfully", Data = null });
         }
 
         [HttpPut("UpdateUser")]
         public async Task<IActionResult> Update(UserModel userModel)
         {
             var result = await _userService.Update(userModel);
-            if (result > 0)
+            if (result.StatusCode == 200)
             {
-                return Ok(new ResponseModel { StatusCode = 200, StatusMessage = "User updated successfully", Data = null });
+                return Ok(new ResponseModel { StatusCode = 200, StatusMessage = StaticData.successMessage, Data = StaticData.data });
             }
-            return Ok(new ResponseModel { StatusCode = 404, StatusMessage = "User not found", Data = null });
+            return BadRequest(new ResponseModel { StatusCode = StaticData.errorCode, StatusMessage = StaticData.errorMessage, Data = StaticData.data });
         }
 
         [HttpDelete("DeleteUser")]
         public IActionResult Delete(int id)
         {
             _userService.Delete(id);
-            return Ok(new ResponseModel { StatusCode = 200, StatusMessage = "User deleted successfully", Data = null });
+            return Ok(new ResponseModel { StatusCode = StaticData.successcode, StatusMessage =StaticData.successMessage, Data = StaticData.data });
         }
 
         [HttpPost("ValidateUser")]
         public async Task<IActionResult> Validate([FromBody] LoginDetails loginDetails)
         {
-            if (!ModelState.IsValid) return BadRequest(new ResponseModel { StatusCode = 400, StatusMessage = "Invalid request", Data = null });
+            if (!ModelState.IsValid) return BadRequest(new ResponseModel { StatusCode = StaticData.errorCode, StatusMessage = StaticData.errorMessage, Data = StaticData.data });
             var result = await _userService.Validate(loginDetails);
             if (result == 0)
             {
-                return Unauthorized(new ResponseModel { StatusCode = 401, StatusMessage = "Invalid credentials", Data = null });
+                return Unauthorized(new ResponseModel { StatusCode = StaticData.errorCode, StatusMessage = StaticData.errorMessage, Data = StaticData.data });
             }
-            var token = _userService.GenerateToken(loginDetails);
 
-            return Ok(new ResponseModel { StatusCode = 200, StatusMessage = "User validated successfully", Data = token });
+
+            TokenService t = new TokenService(_config);
+
+            var token = t.GenerateToken(loginDetails);
+
+            return Ok(new ResponseModel { StatusCode = StaticData.successcode, StatusMessage = StaticData.successMessage, Data = token });
         }
     }
 }

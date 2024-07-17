@@ -25,10 +25,10 @@ namespace NewBackend.Infrastructure.Service
 
         }
 
-        public Task<int> CreateSignup(UserModel userModel)
+        public Task<ResponseModel> CreateSignup(UserModel userModel)
         {
 
-         return  _repository.CreateSignup(userModel);
+         return _repository.CreateSignup(userModel);
             
         }
 
@@ -38,24 +38,14 @@ namespace NewBackend.Infrastructure.Service
             return;
         }
 
-        public string GenerateToken(LoginDetails loginDetails)
-        {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:key"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+       
 
-            var token = new JwtSecurityToken(_config["Jwt:Issuer"], _config["Jwt:Audience"], null,
-                expires: DateTime.Now.AddMinutes(5),
-                signingCredentials: credentials);
-            return new JwtSecurityTokenHandler().WriteToken(token);
-           
-        }
-
-        public Task<IEnumerable<UserModel>> GetDetails()
+        public Task<ResponseModel> GetDetails()
         {
            return _repository.GetDetails();
         }
 
-        public async Task<int> Update(UserModel userModel)
+        public async Task<ResponseModel> Update(UserModel userModel)
         {
            var result=await _repository.Update(userModel);
            return result;
@@ -66,7 +56,5 @@ namespace NewBackend.Infrastructure.Service
             return await _repository.Validate(loginDetails);
         }
 
-       
-       
     }
 }
